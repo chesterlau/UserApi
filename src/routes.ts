@@ -4,9 +4,10 @@ import { createUserHandler, getUserHandler } from "./controller/user.controller"
 import validateRequest from "./middleware/validateRequest"
 import { createUserSessionHandler, getUserSessionsHandler, invalidateUserSessionHandler } from './controller/session.controller';
 import requiresUser from './middleware/requiresUser';
+import { createPostHandler, deletePostHandler, getPostHandler, updatePostHandler } from './controller/post.controller';
+import { createPostSchema, deletePostSchema, updatePostSchema } from './schema/post.schema';
 
 export default (app: Express) => {
-
     app.get("/health", (req: Request, res: Response) => {
         res.sendStatus(200)
     })
@@ -26,5 +27,16 @@ export default (app: Express) => {
     //Logout
     app.delete("/api/sessions", requiresUser, invalidateUserSessionHandler)
 
+    // create post
+    app.post("/api/posts", [requiresUser, validateRequest(createPostSchema)], createPostHandler)
+
+    // update post
+    app.put("/api/posts/:postId", [requiresUser, validateRequest(updatePostSchema)], updatePostHandler)
+
+    // get post
+    app.get("/api/posts/:postId", getPostHandler)
+
+    //delete post
+    app.delete("/api/posts/:postId", [requiresUser, validateRequest(deletePostSchema)], deletePostHandler)
 }
 
