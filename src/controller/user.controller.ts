@@ -19,13 +19,12 @@ export async function createUserHandler(req: Request, res: Response) {
 export async function getUserHandler(req: Request, res: Response) {
 
     const userId = get(req, "params.userId")
-    const user = await findUser(userId)
-
+    const user = await findUser({ _id: userId })
 
     if (!user) {
         return res.sendStatus(404)
     }
-    
+
     return res.send(omit(user.toJSON(), "password"))
 
 }

@@ -1,8 +1,9 @@
-import { createUserSchema } from './schema/user.schema';
+import { createUserSchema, createUserSessionSchema } from './schema/user.schema';
 import { Express, Request, Response } from "express"
 import { createUserHandler, getUserHandler } from "./controller/user.controller"
 import validateRequest from "./middleware/validateRequest"
-
+import { createUserSessionHandler, getUserSessionsHandler, invalidateUserSessionHandler } from './controller/session.controller';
+import requiresUser from './middleware/requiresUser';
 
 export default (app: Express) => {
 
@@ -10,21 +11,20 @@ export default (app: Express) => {
         res.sendStatus(200)
     })
 
+    //Register user
     app.post("/api/users", validateRequest(createUserSchema), createUserHandler)
 
+    
     app.get("/api/users/:userId", getUserHandler)
 
-    //Register user
-    //POST /api/users
-
     //Login
-    //POST /api/sessions
+    app.post("/api/sessions", validateRequest(createUserSessionSchema), createUserSessionHandler)
 
-    //Get the user's session
-    //GET /api/sessions
+    //Get the user's sessions
+    app.get("/api/sessions", requiresUser, getUserSessionsHandler)
 
     //Logout
-    //DELETE /api/sessions
+    app.delete("/api/sessions", requiresUser, invalidateUserSessionHandler)
 
 }
 
